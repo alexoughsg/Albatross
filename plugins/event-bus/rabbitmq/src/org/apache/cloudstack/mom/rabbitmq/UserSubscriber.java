@@ -19,6 +19,11 @@ public class UserSubscriber extends MultiRegionSubscriber {
         super(id);
     }
 
+    protected UserService getUserService(RegionVO region)
+    {
+        return new UserService(region);
+    }
+
     @Override
     public void onEvent(Event event)
     {
@@ -43,7 +48,7 @@ public class UserSubscriber extends MultiRegionSubscriber {
         {
             try
             {
-                UserService userService = new UserService(region);
+                UserService userService = getUserService(region);
                 Method method = userService.getClass().getMethod(methodName, User.class, Account.class, Domain.class, String.class);
                 method.invoke(userService, user, account, domain, oldUserName);
             }

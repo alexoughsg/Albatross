@@ -41,13 +41,37 @@ public class MultiRegionSubscriber  implements EventSubscriber {
     public MultiRegionSubscriber(int id)
     {
         this.id = id;
-        this.gson = new GsonBuilder().create();
-        this.domainDao = ComponentContext.getComponent(DomainDao.class);
-        this.accountDao = ComponentContext.getComponent(AccountDao.class);
-        this.userDao = ComponentContext.getComponent(UserDao.class);
-        this.regionDao = ComponentContext.getComponent(RegionDao.class);
-
+        this.gson = getGson();
+        this.domainDao = getDomainDao();
+        this.accountDao = getAccountDao();
+        this.userDao = getUserDao();
+        this.regionDao = getRegionDao();
         this.regions = findRemoteRegions();
+    }
+
+    protected Gson getGson() {
+        return new GsonBuilder().create();
+    }
+
+    protected DomainDao getDomainDao() {
+        return ComponentContext.getComponent(DomainDao.class);
+    }
+
+    protected AccountDao getAccountDao() {
+        return ComponentContext.getComponent(AccountDao.class);
+    }
+
+    protected UserDao getUserDao() {
+        return ComponentContext.getComponent(UserDao.class);
+    }
+
+    protected RegionDao getRegionDao() {
+        regionDao = ComponentContext.getComponent(RegionDao.class);
+        return regionDao;
+    }
+
+    public void setDescMap(Map<String, String> descMap) {
+        this.descMap = descMap;
     }
 
     protected List<RegionVO> findRemoteRegions()

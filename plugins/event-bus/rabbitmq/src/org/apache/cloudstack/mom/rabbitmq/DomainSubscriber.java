@@ -17,6 +17,10 @@ public class DomainSubscriber extends MultiRegionSubscriber {
         super(id);
     }
 
+    protected DomainService getDomainService(RegionVO region) {
+        return new DomainService(region);
+    }
+
     @Override
     public void onEvent(Event event)
     {
@@ -39,7 +43,7 @@ public class DomainSubscriber extends MultiRegionSubscriber {
         {
             try
             {
-                DomainService domainService = new DomainService(region);
+                DomainService domainService = getDomainService(region);
                 Method method = domainService.getClass().getMethod(methodName, Domain.class, String.class);
                 method.invoke(domainService, domain, oldDomainName);
             }
@@ -53,5 +57,4 @@ public class DomainSubscriber extends MultiRegionSubscriber {
             }
         }
     }
-
 }
