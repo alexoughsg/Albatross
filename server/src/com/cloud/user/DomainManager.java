@@ -16,6 +16,7 @@
 // under the License.
 package com.cloud.user;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -29,13 +30,15 @@ public interface DomainManager extends DomainService {
 
     Domain createDomain(String name, Long parentId, Long ownerId, String networkDomain, String domainUUID);
 
+    Domain createDomain(String name, Long parentId, Long ownerId, String networkDomain, String domainUUID, Date created);
+
     Set<Long> getDomainParentIds(long domainId);
 
     boolean removeDomain(long domainId);
 
     List<? extends Domain> findInactiveDomains();
 
-    boolean deleteDomain(DomainVO domain, Boolean cleanup);
+    boolean deleteDomain(DomainVO domain, Boolean cleanup, Date removed);
     
     boolean deleteDomain(long domainId, Boolean cleanup);
     
@@ -46,5 +49,9 @@ public interface DomainManager extends DomainService {
      *            - the command containing domainId and new domainName
      * @return Domain object if the command succeeded
      */
-    Domain updateDomain(UpdateDomainCmd cmd);    
+    Domain updateDomain(UpdateDomainCmd cmd);
+
+    boolean updateDomain(DomainVO domain, String newDomainName, String newNetworkDomain);
+
+    boolean updateDomain(DomainVO domain, String newDomainName, String newNetworkDomain, Date modified);
 }

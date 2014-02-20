@@ -16,6 +16,7 @@
 // under the License.
 package com.cloud.user;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -114,7 +115,7 @@ public class MockDomainManagerImpl extends ManagerBase implements DomainManager,
     }
 
     @Override
-    public boolean deleteDomain(DomainVO domain, Boolean cleanup) {
+    public boolean deleteDomain(DomainVO domain, Boolean cleanup, Date removed) {
         // TODO Auto-generated method stub
         return false;
     }
@@ -151,9 +152,24 @@ public class MockDomainManagerImpl extends ManagerBase implements DomainManager,
     }
 
     @Override
+    public Domain createDomain(String name, Long parentId, Long ownerId, String networkDomain, String domainUUID, Date created) {
+        return null;
+    }
+
+    @Override
     public Domain updateDomain(UpdateDomainCmd cmd) {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public boolean updateDomain(DomainVO domain, String newDomainName, String newNetworkDomain) {
+        return false;
+    }
+
+    @Override
+    public boolean updateDomain(DomainVO domain, String newDomainName, String newNetworkDomain, Date modified) {
+        return false;
     }
 
     @Override
@@ -162,5 +178,4 @@ public class MockDomainManagerImpl extends ManagerBase implements DomainManager,
         // TODO Auto-generated method stub
         return null;
     }
-
 }

@@ -25,6 +25,8 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
+import com.cloud.domain.Domain;
+import com.cloud.domain.dao.DomainDao;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.apache.cloudstack.context.CallContext;
@@ -44,6 +46,7 @@ public class ActionEventUtils {
     private static final Logger s_logger = Logger.getLogger(ActionEventUtils.class);
 
     private static EventDao _eventDao;
+    private static DomainDao _domainDao;
     private static AccountDao _accountDao;
     protected static UserDao _userDao;
     protected static EventBus _eventBus = null;
@@ -55,6 +58,7 @@ public class ActionEventUtils {
     public static final String EntityDetails = "entity_details";
 
     @Inject EventDao eventDao;
+    @Inject DomainDao domainDao;
     @Inject AccountDao accountDao;
     @Inject UserDao userDao;
 
@@ -64,6 +68,7 @@ public class ActionEventUtils {
     @PostConstruct
     void init() {
     	_eventDao = eventDao;
+        _domainDao = domainDao;
     	_accountDao = accountDao;
     	_userDao = userDao;
     }
@@ -126,6 +131,8 @@ public class ActionEventUtils {
     public static Long onCompletedActionEvent(Long userId, Long accountId, String level, String type,
                                               String description, long startEventId) {
 
+        description = addDescription(EventCategory.ACTION_EVENT.getName(), type, description);
+
         publishOnEventBus(userId, accountId, EventCategory.ACTION_EVENT.getName(), type,
                 com.cloud.event.Event.State.Completed, description);
 
@@ -179,10 +186,21 @@ public class ActionEventUtils {
         // get the entity details for which ActionEvent is generated
         String entityType = null;
         String entityUuid = null;
+        String oldEntityName = null;
         CallContext context = CallContext.current();
         if (context != null) {
-            entityType = (String)context.getContextParameter(EntityType);
-            entityUuid = (String)context.getContextParameter(EntityUuid);
+            Class entityKey = getEntityKey(eventType);
+            if (entityKey != null) {
+                entityUuid = (String)context.getContextParameter(entityKey);
+                if (entityUuid != null) {
+                    entityType = entityKey.getName();
+                    oldEntityName = (String)context.getContextParameter(entityUuid);
+                }
+            }
+            else {
+                entityType = (String)context.getContextParameter(EntityType);
+                entityUuid = (String)context.getContextParameter(EntityUuid);
+            }
         }
 
         org.apache.cloudstack.framework.events.Event event = new org.apache.cloudstack.framework.events.Event(
@@ -206,6 +224,7 @@ public class ActionEventUtils {
         eventDescription.put("entity", entityType);
         eventDescription.put("entityuuid", entityUuid);
         eventDescription.put("description", description);
+        eventDescription.put("oldentityname", oldEntityName);
 
         String eventDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z").format(new Date());
         eventDescription.put("eventDateTime", eventDate);
@@ -226,5 +245,86 @@ public class ActionEventUtils {
             return 0;
         }
         return account.getDomainId();
+    }
+
+    private static Class getEntityKey(String eventType)
+    {
+        if (eventType.startsWith("DOMAIN."))
+        {
+            return Domain.class;
+        }
+        else if (eventType.startsWith("ACCOUNT."))
+        {
+            return Account.class;
+        }
+        else if (eventType.startsWith("USER."))
+        {
+            return User.class;
+        }
+
+        return null;
+    }
+
+    private static String addDescription(String eventCategory, String eventType, String description)
+    {
+        if (!eventCategory.equals("ActionEvent"))   return description;
+        if (!eventType.endsWith(".CREATE") && !eventType.endsWith(".DELETE") && !eventType.endsWith(".UPDATE"))    return description;
+
+        Class entityKey = getEntityKey(eventType);
+        if (entityKey == null)  return description;
+
+        CallContext context = CallContext.current();
+        String entityUuid = (String)context.getContextParameter(entityKey);
+        if (entityUuid == null) return description;
+
+        s_logger.debug("description before addition : " + description);
+
+        String newEntityName = "";
+
+        if (eventType.startsWith("DOMAIN."))
+        {
+            Domain domain = _domainDao.findByUuidIncludingRemoved(entityUuid);
+            description += ", Domain Path:" + domain.getPath();
+            newEntityName = domain.getName();
+        }
+        else if (eventType.startsWith("ACCOUNT."))
+        {
+            Account account = _accountDao.findByUuidIncludingRemoved(entityUuid);
+            Domain domain = _domainDao.findById(account.getDomainId());
+            if (eventType.endsWith(".CREATE"))
+            {
+                description += ", Domain Path:" + domain.getPath();
+            }
+            else
+            {
+                description += ", Account Name:" + account.getAccountName() + ", Domain Path:" + domain.getPath();
+            }
+            newEntityName = account.getAccountName();
+        }
+        else if (eventType.startsWith("USER."))
+        {
+            User user = _userDao.findByUuidIncludingRemoved(entityUuid);
+            Account account = _accountDao.findById(user.getAccountId());
+            Domain domain = _domainDao.findById(account.getDomainId());
+            if (eventType.endsWith(".CREATE"))
+            {
+                description += ", Account Name:" + account.getAccountName() + ", Domain Path:" + domain.getPath();
+            }
+            else
+            {
+                description += ", User Name:" + user.getUsername() + ", Account Name:" + account.getAccountName() + ", Domain Path:" + domain.getPath();
+            }
+            newEntityName = user.getUsername();
+        }
+
+        if (eventType.endsWith(".UPDATE"))
+        {
+            String oldEntityName = (String)context.getContextParameter(entityUuid);
+            description += ", Old Entity Name:" + oldEntityName + ", New Entity Name:" + newEntityName;
+        }
+
+        s_logger.debug("description after addition : " + description);
+
+        return description;
     }
 }

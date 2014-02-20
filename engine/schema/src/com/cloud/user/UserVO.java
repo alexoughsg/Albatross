@@ -97,6 +97,9 @@ public class UserVO implements User, Identity, InternalIdentity {
     @Column(name = "default")
     boolean isDefault;
 
+    @Column(name = GenericDao.MODIFIED_COLUMN)
+    private Date modified;
+
     public UserVO() {
         this.uuid = UUID.randomUUID().toString();
     }
@@ -107,6 +110,10 @@ public class UserVO implements User, Identity, InternalIdentity {
     }
     
     public UserVO(long accountId, String username, String password, String firstName, String lastName, String email, String timezone, String uuid) {
+        this(accountId, username, password, firstName, lastName, email, timezone, uuid, null);
+    }
+
+    public UserVO(long accountId, String username, String password, String firstName, String lastName, String email, String timezone, String uuid, Date created) {
         this.accountId = accountId;
         this.username = username;
         this.password = password;
@@ -116,6 +123,8 @@ public class UserVO implements User, Identity, InternalIdentity {
         this.timezone = timezone;
         this.state = State.enabled;
     	this.uuid = uuid;
+        this.created = created;
+        if (created != null)    { this.modified = created; }
     }
     
     @Override
@@ -270,5 +279,9 @@ public class UserVO implements User, Identity, InternalIdentity {
     public boolean isDefault() {
         return isDefault;
     }
-    
+
+    public Date getModified() { return modified; }
+
+    @Override
+    public void setModified(Date modified) { this.modified = modified; }
 }

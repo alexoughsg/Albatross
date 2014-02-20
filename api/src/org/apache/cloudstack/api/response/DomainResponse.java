@@ -24,6 +24,8 @@ import com.cloud.domain.Domain;
 import com.cloud.serializer.Param;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Date;
+
 @EntityReference(value = Domain.class)
 public class DomainResponse extends BaseResponse {
     @SerializedName(ApiConstants.ID) @Param(description="the ID of the domain")
@@ -31,6 +33,12 @@ public class DomainResponse extends BaseResponse {
 
     @SerializedName(ApiConstants.NAME) @Param(description="the name of the domain")
     private String domainName;
+
+    @SerializedName(ApiConstants.CREATED) @Param(description = "the timestamp when this domain was created")
+    private Date created;
+
+    @SerializedName(ApiConstants.MODIFIED) @Param(description = "the timestamp when this domain was last modified")
+    private Date modified;
 
     @SerializedName(ApiConstants.LEVEL) @Param(description="the level of the domain")
     private Integer level;
@@ -110,4 +118,11 @@ public class DomainResponse extends BaseResponse {
         this.path = path;
     }
 
+    public Date getCreated() { return created; }
+
+    public void setCreated(Date created) { this.created = created; }
+
+    public Date getModified() { return modified; }
+
+    public void setModified(Date modified) { this.modified = modified; }
 }

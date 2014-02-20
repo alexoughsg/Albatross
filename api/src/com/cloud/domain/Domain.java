@@ -59,6 +59,10 @@ public interface Domain extends OwnedBy, Identity, InternalIdentity {
     void setState(State state);
 
     String getNetworkDomain();
+
+    Date getCreated();
+
+    Date getModified();
     
     public String getUuid();
     
