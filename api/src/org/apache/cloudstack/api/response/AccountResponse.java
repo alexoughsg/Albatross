@@ -16,6 +16,7 @@
 // under the License.
 package org.apache.cloudstack.api.response;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -45,6 +46,9 @@ public class AccountResponse extends BaseResponse implements ResourceLimitAndCou
 
     @SerializedName(ApiConstants.DOMAIN) @Param(description="name of the Domain the account belongs too")
     private String domainName;
+
+    @SerializedName(ApiConstants.PATH) @Param(description = "path of the Domain the account belongs too")
+    private String domainPath;
 
     @SerializedName(ApiConstants.DEFAULT_ZONE_ID) @Param(description="the default zone of the account")
     private String defaultZoneId;
@@ -187,6 +191,11 @@ public class AccountResponse extends BaseResponse implements ResourceLimitAndCou
     @SerializedName(ApiConstants.IS_DEFAULT) @Param(description="true if account is default, false otherwise", since="4.2.0")
     private Boolean isDefault;
 
+    @SerializedName(ApiConstants.CREATED) @Param(description = "the timestamp when this account was created")
+    private Date created;
+
+    @SerializedName(ApiConstants.MODIFIED) @Param(description = "the timestamp when this account was last modified")
+    private Date modified;
 
     @Override
     public String getObjectId() {
@@ -212,6 +221,8 @@ public class AccountResponse extends BaseResponse implements ResourceLimitAndCou
     public void setDomainName(String domainName) {
         this.domainName = domainName;
     }
+
+    public void setDomainPath(String domainPath) { this.domainPath = domainPath; }
 
     public void setBytesReceived(Long bytesReceived) {
         this.bytesReceived = bytesReceived;
@@ -435,4 +446,8 @@ public class AccountResponse extends BaseResponse implements ResourceLimitAndCou
     public void setIsDefault(Boolean isDefault) {
         this.isDefault = isDefault;
     }
+
+    public void setCreated(Date created) { this.created = created; }
+
+    public void setModified(Date modified) { this.modified = modified; }
 }

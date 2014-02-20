@@ -854,7 +854,7 @@ public class ProjectManagerImpl extends ManagerBase implements ProjectManager {
                 project.setState(Project.State.Active);
                 _projectDao.update(projectId, project);
         
-                _accountMgr.enableAccount(project.getProjectAccountId());
+                _accountMgr.enableAccount(project.getProjectAccountId(), null);
             }
         });
 

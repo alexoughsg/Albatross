@@ -16,10 +16,7 @@
 // under the License.
 package com.cloud.user;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import javax.ejb.Local;
 import javax.inject.Inject;
@@ -65,7 +62,6 @@ import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.Transaction;
 import com.cloud.utils.db.TransactionCallback;
-import com.cloud.utils.db.TransactionCallbackNoReturn;
 import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.NetUtils;
@@ -170,6 +166,12 @@ public class DomainManagerImpl extends ManagerBase implements DomainManager, Dom
     @Override
     @DB
     public Domain createDomain(final String name, final Long parentId, final Long ownerId, final String networkDomain, String domainUUID) {
+        return createDomain(name, parentId, ownerId, networkDomain, domainUUID, null);
+    }
+
+    @Override
+    @DB
+    public Domain createDomain(final String name, final Long parentId, final Long ownerId, final String networkDomain, String domainUUID, final Date created){
         // Verify network domain
         if (networkDomain != null) {
             if (!NetUtils.verifyDomainName(networkDomain)) {
@@ -196,13 +198,22 @@ public class DomainManagerImpl extends ManagerBase implements DomainManager, Dom
         DomainVO domain = Transaction.execute(new TransactionCallback<DomainVO>() {
             @Override
             public DomainVO doInTransaction(TransactionStatus status) {
-                DomainVO domain = _domainDao.create(new DomainVO(name, ownerId, parentId, networkDomain, domainUUIDFinal));
+                DomainVO newDomain = new DomainVO(name, ownerId, parentId, networkDomain, domainUUIDFinal);
+                if (created == null) {
+                    newDomain.setCreated(new Date());
+                    newDomain.setModified(new Date());
+                }
+                else {
+                    newDomain.setCreated(created);
+                    newDomain.setModified(created);
+                }
+                DomainVO domain = _domainDao.create(newDomain);
                 _resourceCountDao.createResourceCounts(domain.getId(), ResourceLimit.ResourceOwnerType.Domain);
                 return domain;
             }
         });
 
-        CallContext.current().putContextParameter(Domain.class, domain.getUuid());
+        if (CallContext.current() != null)  CallContext.current().putContextParameter(Domain.class, domain.getUuid());
         return domain;
     }
 
@@ -241,11 +252,11 @@ public class DomainManagerImpl extends ManagerBase implements DomainManager, Dom
 
         _accountMgr.checkAccess(caller, domain);
 
-        return deleteDomain(domain, cleanup);
+        return deleteDomain(domain, cleanup, null);
     }
 
     @Override
-    public boolean deleteDomain(DomainVO domain, Boolean cleanup) {
+    public boolean deleteDomain(DomainVO domain, Boolean cleanup, Date removed) {
         // mark domain as inactive
         s_logger.debug("Marking domain id=" + domain.getId() + " as " + Domain.State.Inactive + " before actually deleting it");
         domain.setState(Domain.State.Inactive);
@@ -272,7 +283,7 @@ public class DomainManagerImpl extends ManagerBase implements DomainManager, Dom
                     hasDedicatedResources = true;
                 }
                 if (accountsForCleanup.isEmpty() && networkIds.isEmpty()&& !hasDedicatedResources) {
-                    if (!_domainDao.remove(domain.getId())) {
+                    if (!_domainDao.remove(domain.getId(), removed)) {
                         rollBackState = true;
                         CloudRuntimeException e = new CloudRuntimeException("Delete failed on domain " + domain.getName() + " (id: " + domain.getId() + "); Please make sure all users and sub domains have been removed from the domain before deleting");
                         e.addProxyObject(domain.getUuid(), "domainId");
@@ -561,7 +572,7 @@ public class DomainManagerImpl extends ManagerBase implements DomainManager, Dom
     @DB
     public DomainVO updateDomain(UpdateDomainCmd cmd) {
         final Long domainId = cmd.getId();
-        final String domainName = cmd.getDomainName();
+        final String newDomainName = cmd.getDomainName();
         final String networkDomain = cmd.getNetworkDomain();
 
         // check if domain exists in the system
@@ -570,14 +581,43 @@ public class DomainManagerImpl extends ManagerBase implements DomainManager, Dom
             InvalidParameterValueException ex = new InvalidParameterValueException("Unable to find domain with specified domain id");
             ex.addProxyObject(domainId.toString(), "domainId");
             throw ex;
-        } else if (domain.getParent() == null && domainName != null) {
+        } else if (domain.getParent() == null && newDomainName != null) {
             // check if domain is ROOT domain - and deny to edit it with the new name
             throw new InvalidParameterValueException("ROOT domain can not be edited with a new name");
         }
 
+        String currentDomainName = domain.getName();
+
         // check permissions
         Account caller = CallContext.current().getCallingAccount();
         _accountMgr.checkAccess(caller, domain);
+
+        boolean success = updateDomain(domain, newDomainName, networkDomain);
+        if(success) {
+            CallContext.current().putContextParameter(Domain.class, domain.getUuid());
+            CallContext.current().putContextParameter(domain.getUuid(), currentDomainName);
+        }
+
+        return _domainDao.findById(domainId);
+    }
+
+    @Override
+    @DB
+    public boolean updateDomain(final DomainVO domain, String newDomainName, String newNetworkDomain)
+    {
+        return updateDomain(domain, newDomainName, newNetworkDomain, null);
+    }
+
+    @Override
+    @DB
+    public boolean updateDomain(final DomainVO domain, String newDomainName, String newNetworkDomain, Date modified)
+    {
+        final Long domainId = domain.getId();
+
+        final String domainName = newDomainName;
+        final String oldDomainName = domain.getName();
+        final String networkDomain = newNetworkDomain;
+        final Date modifiedDate = modified;
 
         // domain name is unique in the cloud
         if (domainName != null) {
@@ -603,9 +643,9 @@ public class DomainManagerImpl extends ManagerBase implements DomainManager, Dom
             }
         }
 
-        Transaction.execute(new TransactionCallbackNoReturn() {
+        boolean success = Transaction.execute(new TransactionCallback<Boolean>() {
             @Override
-            public void doInTransactionWithoutResult(TransactionStatus status) {
+            public Boolean doInTransaction(TransactionStatus status) {
                 if (domainName != null) {
                     String updatedDomainPath = getUpdatedDomainPath(domain.getPath(), domainName);
                     updateDomainChildren(domain, updatedDomainPath);
@@ -620,13 +660,20 @@ public class DomainManagerImpl extends ManagerBase implements DomainManager, Dom
                         domain.setNetworkDomain(networkDomain);
                     }
                 }
-                _domainDao.update(domainId, domain);
-                CallContext.current().putContextParameter(Domain.class, domain.getUuid());
+                if (modifiedDate == null) {
+                    domain.setModified(new Date());
+                }
+                else {
+                    domain.setModified(modifiedDate);
+                }
+
+                boolean success = _domainDao.update(domainId, domain);
+                return success;
             }
         });
 
 
-        return _domainDao.findById(domainId);
+        return success;
 
     }
 
