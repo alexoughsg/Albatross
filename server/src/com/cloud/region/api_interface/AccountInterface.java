@@ -12,12 +12,20 @@ public class AccountInterface extends BaseInterface {
     {
         super(url);
     }
+    
+    public String getCookie() {
+  		return this.cookie;
+  	}
+
+  	public String getSessionKey() {
+  		return this.sessionKey;
+  	}
 
     public JSONArray listAccounts(String domainId) throws Exception
     {
         // command=listAccounts&response=json&sessionkey=XxjzeJWHV3S%2Brwq2m2EsYTSIYNE%3D&listAll=true&page=1&pagesize=20&_=1362457447296
 
-        String paramStr = "command=listAccounts&listAll=true&response=json&sessionkey=" + URLEncoder.encode(this.sessionKey, "UTF-8");
+        String paramStr = "command=listAccounts&listAll=true&response=json&sessionkey=" + URLEncoder.encode(getSessionKey(), "UTF-8");
         if (domainId != null)   paramStr += "&domainId=" + domainId;
         JSONObject retJson = sendApacheGet(paramStr);
         if (!BaseService.hasAttribute(retJson, "account"))
@@ -41,7 +49,7 @@ public class AccountInterface extends BaseInterface {
 
     public JSONObject findAccount(String domainId, String accountName) throws Exception
     {
-        String paramStr = "command=listAccounts&domainid=" + domainId + "&name=" + accountName + "&response=json&sessionkey=" + URLEncoder.encode(this.sessionKey, "UTF-8");
+        String paramStr = "command=listAccounts&domainid=" + domainId + "&name=" + accountName + "&response=json&sessionkey=" + URLEncoder.encode(getSessionKey(), "UTF-8");
         JSONObject retJson = sendApacheGet(paramStr);
         if (!BaseService.hasAttribute(retJson, "account"))
         {
@@ -59,7 +67,7 @@ public class AccountInterface extends BaseInterface {
 
     public JSONObject findAccount(String uuid) throws Exception
     {
-        String paramStr = "command=listAccounts&id=" + uuid + "&response=json&sessionkey=" + URLEncoder.encode(this.sessionKey, "UTF-8");
+        String paramStr = "command=listAccounts&id=" + uuid + "&response=json&sessionkey=" + URLEncoder.encode(getSessionKey(), "UTF-8");
         JSONObject retJson = sendApacheGet(paramStr);
         if (!BaseService.hasAttribute(retJson, "account"))
         {
@@ -91,7 +99,7 @@ public class AccountInterface extends BaseInterface {
 
         String paramStr = "command=createAccount&username=" + userName + "&password=" + password;
         paramStr += "&email=" + email + "&firstname=" + firstName + "&lastname=" + lastName + "&accounttype=" + accountType;
-        paramStr += "&response=json&sessionkey=" + URLEncoder.encode(this.sessionKey, "UTF-8");
+        paramStr += "&response=json&sessionkey=" + URLEncoder.encode(getSessionKey(), "UTF-8");
         if (accountName != null)    paramStr += "&account=" + accountName;
         if (domainId != null)   paramStr += "&domainid=" + domainId;
         if (accountDetails != null) paramStr += "&accountdetails=" + accountDetails;
@@ -103,7 +111,7 @@ public class AccountInterface extends BaseInterface {
 
     public JSONObject updateAccount(String accountId, String currentName, String newName, String details, String domainId, String networkDomain) throws Exception
     {
-        String paramStr = "command=updateAccount&id=" + accountId + "&response=json&sessionkey=" + URLEncoder.encode(this.sessionKey, "UTF-8");
+        String paramStr = "command=updateAccount&id=" + accountId + "&response=json&sessionkey=" + URLEncoder.encode(getSessionKey(), "UTF-8");
         if (currentName != null)  paramStr += "&account=" + currentName;
         if (newName != null)  paramStr += "&newname=" + newName;
         if (details != null)   paramStr += "&accountdetails=" + details;
@@ -115,25 +123,25 @@ public class AccountInterface extends BaseInterface {
 
     public JSONObject deleteAccount(String accountId) throws Exception
     {
-        String paramStr = "command=deleteAccount&id=" + accountId + "&response=json&sessionkey=" + URLEncoder.encode(this.sessionKey, "UTF-8");
+        String paramStr = "command=deleteAccount&id=" + accountId + "&response=json&sessionkey=" + URLEncoder.encode(getSessionKey(), "UTF-8");
         return sendApacheGet(paramStr);
     }
 
     public JSONObject disableAccount(String accountId) throws Exception
     {
-        String paramStr = "command=disableAccount&id=" + accountId + "&lock=false&response=json&sessionkey=" + URLEncoder.encode(this.sessionKey, "UTF-8");
+        String paramStr = "command=disableAccount&id=" + accountId + "&lock=false&response=json&sessionkey=" + URLEncoder.encode(getSessionKey(), "UTF-8");
         return sendApacheGet(paramStr);
     }
 
     public JSONObject lockAccount(String accountId) throws Exception
     {
-        String paramStr = "command=disableAccount&id=" + accountId + "&lock=true&response=json&sessionkey=" + URLEncoder.encode(this.sessionKey, "UTF-8");
+        String paramStr = "command=disableAccount&id=" + accountId + "&lock=true&response=json&sessionkey=" + URLEncoder.encode(getSessionKey(), "UTF-8");
         return sendApacheGet(paramStr);
     }
 
     public JSONObject enableAccount(String accountId) throws Exception
     {
-        String paramStr = "command=enableAccount&id=" + accountId + "&response=json&sessionkey=" + URLEncoder.encode(this.sessionKey, "UTF-8");
+        String paramStr = "command=enableAccount&id=" + accountId + "&response=json&sessionkey=" + URLEncoder.encode(getSessionKey(), "UTF-8");
         return sendApacheGet(paramStr);
     }
 

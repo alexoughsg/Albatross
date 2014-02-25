@@ -12,6 +12,15 @@ public class DomainInterface extends BaseInterface {
     {
         super(url);
     }
+    
+    public String getCookie() {
+  		return this.cookie;
+  	}
+
+  	public String getSessionKey() {
+  		return this.sessionKey;
+  	}
+
 
     private void modifyPath(JSONObject domainJson)
     {
@@ -28,7 +37,7 @@ public class DomainInterface extends BaseInterface {
         // command=listDomains&response=json&sessionkey=null&_=1362457544896
         // { "listdomainsresponse" : { "count":2 ,"domain" : [  {"id":"45152a26-a2ce-11e2-8da9-28fb734f3313","name":"ROOT","level":0,"haschild":true,"path":"ROOT"}, {"id":"3d12e7d5-a528-4626-a423-d1e17024ff91","name":"Ough","level":1,"parentdomainid":"45152a26-a2ce-11e2-8da9-28fb734f3313","parentdomainname":"ROOT","haschild":false,"path":"ROOT/Ough"} ] } }
 
-        String paramStr = "command=listDomains&response=json&sessionkey=" + URLEncoder.encode(this.sessionKey, "UTF-8");
+        String paramStr = "command=listDomains&response=json&sessionkey=" + URLEncoder.encode(getSessionKey(), "UTF-8");
         if (listAll)    paramStr += "&listall" + listAll;
         JSONObject retJson = sendApacheGet(paramStr);
         if (!BaseService.hasAttribute(retJson, "domain"))
@@ -47,7 +56,7 @@ public class DomainInterface extends BaseInterface {
 
     public JSONObject findDomain(String uuid) throws Exception
     {
-        String paramStr = "command=listDomains&id=" + uuid + "&response=json&sessionkey=" + URLEncoder.encode(this.sessionKey, "UTF-8");
+        String paramStr = "command=listDomains&id=" + uuid + "&response=json&sessionkey=" + URLEncoder.encode(getSessionKey(), "UTF-8");
         JSONObject retJson = sendApacheGet(paramStr);
         if (!BaseService.hasAttribute(retJson, "domain"))
         {
@@ -68,7 +77,7 @@ public class DomainInterface extends BaseInterface {
         // command=listDomains&response=json&sessionkey=null&_=1362457544896
         // { "listdomainsresponse" : { "count":2 ,"domain" : [  {"id":"45152a26-a2ce-11e2-8da9-28fb734f3313","name":"ROOT","level":0,"haschild":true,"path":"ROOT"}, {"id":"3d12e7d5-a528-4626-a423-d1e17024ff91","name":"Ough","level":1,"parentdomainid":"45152a26-a2ce-11e2-8da9-28fb734f3313","parentdomainname":"ROOT","haschild":false,"path":"ROOT/Ough"} ] } }
 
-        String paramStr = "command=listDomains&level=" + level + "&name=" + name + "&response=json&sessionkey=" + URLEncoder.encode(this.sessionKey, "UTF-8");
+        String paramStr = "command=listDomains&level=" + level + "&name=" + name + "&response=json&sessionkey=" + URLEncoder.encode(getSessionKey(), "UTF-8");
         JSONObject retJson = sendApacheGet(paramStr);
         if (!BaseService.hasAttribute(retJson, "domain"))
         {
@@ -100,7 +109,7 @@ public class DomainInterface extends BaseInterface {
 
     public JSONArray listChildDomains(String parentDomainId, boolean isRecursive) throws Exception
     {
-        String paramStr = "command=listDomainChildren&response=json&sessionkey=" + URLEncoder.encode(this.sessionKey, "UTF-8");
+        String paramStr = "command=listDomainChildren&response=json&sessionkey=" + URLEncoder.encode(getSessionKey(), "UTF-8");
         if (parentDomainId != null)    paramStr += "&id=" + parentDomainId;
         if (isRecursive)
         {
@@ -136,7 +145,7 @@ public class DomainInterface extends BaseInterface {
             &_=1365892060259
          */
 
-        String paramStr = "command=createDomain&name=" + name + "&response=json&sessionkey=" + URLEncoder.encode(this.sessionKey, "UTF-8");
+        String paramStr = "command=createDomain&name=" + name + "&response=json&sessionkey=" + URLEncoder.encode(getSessionKey(), "UTF-8");
         if (parentDomainId != null)    paramStr += "&parentdomainid=" + parentDomainId;
         if (domainId != null)   paramStr += "&domainid=" + domainId;
         if (networkDomain != null) paramStr += "&networkdomain=" + networkDomain;
@@ -145,7 +154,7 @@ public class DomainInterface extends BaseInterface {
 
     public JSONObject updateDomain(String domainId, String name, String networkDomain) throws Exception
     {
-        String paramStr = "command=updateDomain&id=" + domainId + "&response=json&sessionkey=" + URLEncoder.encode(this.sessionKey, "UTF-8");
+        String paramStr = "command=updateDomain&id=" + domainId + "&response=json&sessionkey=" + URLEncoder.encode(getSessionKey(), "UTF-8");
         if (name != null)  paramStr += "&name=" + name;
         if (networkDomain != null)    paramStr += "&networkdomain=" + networkDomain;
 
@@ -154,7 +163,7 @@ public class DomainInterface extends BaseInterface {
 
     public JSONObject deleteDomain(String domainId, boolean cleanUp) throws Exception
     {
-        String paramStr = "command=deleteDomain&id=" + domainId + "&response=json&sessionkey=" + URLEncoder.encode(this.sessionKey, "UTF-8");
+        String paramStr = "command=deleteDomain&id=" + domainId + "&response=json&sessionkey=" + URLEncoder.encode(getSessionKey(), "UTF-8");
         if (cleanUp)    paramStr += "&cleanup=" + cleanUp;
         return sendApacheGet(paramStr);
     }
