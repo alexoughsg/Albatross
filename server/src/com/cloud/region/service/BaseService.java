@@ -93,7 +93,7 @@ public class BaseService {
         return false;
     }
 
-  public static String getAttrValue(JSONObject obj, String attrName)
+    public static String getAttrValue(JSONObject obj, String attrName)
     {
         try
         {
