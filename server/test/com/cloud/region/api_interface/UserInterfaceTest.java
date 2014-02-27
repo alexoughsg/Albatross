@@ -1,3 +1,21 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package com.cloud.region.api_interface;
 
 import org.junit.Before;
@@ -44,17 +62,12 @@ public class UserInterfaceTest extends TestCase {
     			
     			jsonObj.put("user", list);
     			
+    			// uncomment to return empty JSONOject
+    			/*jsonObj = new JSONObject();
+    			return jsonObj;*/
+    			
     			return jsonObj;
     		}
-    		
-    		// Note: Replace this method with the above method to test the negative test cases
-    		// 1. If the JSONObject is empty 
-    		// 2. No users
-    		/*public JSONObject sendApacheGet(String paramStr) throws Exception {
-    			
-    			JSONObject jsonObj = new JSONObject();
-    			return jsonObj;
-    		}*/
     		
     		public JSONObject sendApachePost(String paramStr) throws Exception {
     			
@@ -68,9 +81,9 @@ public class UserInterfaceTest extends TestCase {
     }
 	
 	
-    // Test scenario : listUsers() : Success
+    // Test scenario : listUsers()
     @Test
-    public void testListUsersSuccess() throws Exception {
+    public void testListUsers() throws Exception {
     	
     	JSONArray expected = new JSONArray();
 			
@@ -117,7 +130,7 @@ public class UserInterfaceTest extends TestCase {
     
     // Test scenario : findUser() : Success
     @Test
-    public void testfindUserSuccess() throws Exception {
+    public void testfindUser() throws Exception {
     	
     	JSONObject expected = new JSONObject();
     	expected.put("domainid", "2");
@@ -127,26 +140,19 @@ public class UserInterfaceTest extends TestCase {
 		JSONObject result = userInterface.findUser("123sdhdfsod1213");
 		
 		Assert.assertEquals(expected.toString(), result.toString());
-    	
-    }
-    
-    // To test this scenario the sendApacheGet method from the setUp needs to be uncommented
-/*    // Test scenario : findUser() : No user 
-    @Test
-    public void testfindUserNoUser() throws Exception {
-    	
-		JSONObject result = userInterface.findUser("123sdhdfsod1213");
 		
-		Assert.assertNull(result);
+		// To run this test uncomment the return statement for sendApacheGet() in setup(), it should return an empty JSONObject
+		// Test scenario : No user
+
+		/*JSONObject result = userInterface.findUser("123sdhdfsod1213");
+		Assert.assertNull(result);*/
     	
     }
-*/    
     
     // Test scenario : createUser() : create user success
     @Test
-    public void testCreateUserSuccess() throws Exception {
+    public void testCreateUser() throws Exception {
     	
-		
 		JSONObject expected = new JSONObject();
 		expected.put("success", true);
     	
@@ -158,7 +164,7 @@ public class UserInterfaceTest extends TestCase {
     
     // Test scenario : updateUser() : update user success
     @Test
-    public void testUpdateUserSuccess() throws Exception {
+    public void testUpdateUser() throws Exception {
     	
 		
     	JSONObject expected = new JSONObject();
