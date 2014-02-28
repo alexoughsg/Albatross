@@ -22,12 +22,24 @@ public class LocalGenerator {
     protected UserDao userDao;
     protected AccountDao accountDao;
     protected DomainDao domainDao;
+    
+    public UserDao getUserDao() {
+		return ComponentContext.getComponent(UserDao.class);
+	}
 
-    public LocalGenerator()
+	public AccountDao getAccountDao() {
+		return ComponentContext.getComponent(AccountDao.class);
+	}
+
+	public DomainDao getDomainDao() {
+		return ComponentContext.getComponent(DomainDao.class);
+	}
+
+	public LocalGenerator()
     {
-        this.userDao = ComponentContext.getComponent(UserDao.class);
-        this.accountDao = ComponentContext.getComponent(AccountDao.class);
-        this.domainDao = ComponentContext.getComponent(DomainDao.class);
+        this.userDao = getUserDao();
+        this.accountDao = getAccountDao();
+        this.domainDao = getDomainDao();
     }
 
     protected int generateRandNumber(int max)
