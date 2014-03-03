@@ -20,14 +20,29 @@ public class UserLocalGeneratorEvent extends LocalGenerator {
 
     private UserService userService;
     private DomainDao domainDao;
+    private RegionDao regionDao;
 
-    public UserLocalGeneratorEvent()
+    public UserService getUserService(RegionVO region) {
+    	UserService userService = new UserService(region.getName(), region.getEndPoint(), region.getUserName(), region.getPassword());
+		return userService;
+	}
+
+	public DomainDao getDomainDao() {
+		DomainDao domainDao = ComponentContext.getComponent(DomainDao.class);
+		return domainDao;
+	}
+	
+	public RegionDao getRegionDao() {
+		RegionDao regionDao = ComponentContext.getComponent(RegionDao.class);
+		return regionDao;
+	}
+
+	public UserLocalGeneratorEvent()
     {
-        this.domainDao = ComponentContext.getComponent(DomainDao.class);
-
-        RegionDao regionDao = ComponentContext.getComponent(RegionDao.class);
+        this.domainDao = getDomainDao();
+        this.regionDao = getRegionDao();
         RegionVO region = regionDao.findByName("Local");
-        this.userService = new UserService(region.getName(), region.getEndPoint(), region.getUserName(), region.getPassword());
+        this.userService = getUserService(region);
     }
 
     public JSONObject create()

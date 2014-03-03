@@ -16,9 +16,14 @@ public class UserLocalGenerator extends LocalGenerator {
 
     private LocalUserManager localUserManager;
 
-    public UserLocalGenerator()
+    public LocalUserManager getLocalUserManager() {
+    	LocalUserManager localUserManager = new LocalUserManager();
+		return localUserManager;
+	}
+
+	public UserLocalGenerator()
     {
-        this.localUserManager = new LocalUserManager();
+        this.localUserManager = getLocalUserManager();
     }
 
     public UserVO create()
