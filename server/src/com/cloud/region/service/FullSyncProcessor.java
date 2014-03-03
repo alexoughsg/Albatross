@@ -1,7 +1,10 @@
 package com.cloud.region.service;
 
 import com.amazonaws.util.json.JSONObject;
+import com.cloud.domain.dao.DomainDao;
 import com.cloud.rmap.dao.RmapDao;
+import com.cloud.user.dao.AccountDao;
+import com.cloud.user.dao.UserDao;
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.component.ComponentContext;
 import org.apache.cloudstack.region.RegionVO;
@@ -33,7 +36,42 @@ public abstract class FullSyncProcessor {
         this.userName = region.getUserName();
         this.password = region.getPassword();
 
-        this.rmapDao = ComponentContext.getComponent(RmapDao.class);
+        this.rmapDao = getRmapDao();
+    }
+
+    protected RmapDao getRmapDao()
+    {
+        return ComponentContext.getComponent(RmapDao.class);
+    }
+
+    protected DomainDao getDomainDao()
+    {
+        return ComponentContext.getComponent(DomainDao.class);
+    }
+
+    protected AccountDao getAccountDao()
+    {
+        return ComponentContext.getComponent(AccountDao.class);
+    }
+
+    protected UserDao getUserDao()
+    {
+        return ComponentContext.getComponent(UserDao.class);
+    }
+
+    protected DomainService allocateDomainService()
+    {
+        return new DomainService(hostName, endPoint, userName, password);
+    }
+
+    protected AccountService allocateAccountService()
+    {
+        return new AccountService(hostName, endPoint, userName, password);
+    }
+
+    protected UserService allocateUserService()
+    {
+        return new UserService(hostName, endPoint, userName, password);
     }
 
     protected boolean strCompare(String str1, String str2)

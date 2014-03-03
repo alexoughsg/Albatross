@@ -27,13 +27,13 @@ public class UserFullSyncProcessor extends FullSyncProcessor {
     protected DomainDao domainDao;
 
     protected DomainVO localParentDomain;
-    protected AccountVO localParent;
+    //protected AccountVO localParent;
     protected List<UserVO> localList;
     protected List<UserVO> processedLocalList = new ArrayList<UserVO>();
 
     protected List<AccountVO> localAccountList;
 
-    protected JSONObject remoteParentDomain;
+    //protected JSONObject remoteParentDomain;
     protected List<JSONObject> remoteAccountList;
 
     private LocalUserManager localUserManager;
@@ -43,10 +43,19 @@ public class UserFullSyncProcessor extends FullSyncProcessor {
     {
         super(region);
 
-        this.userDao = ComponentContext.getComponent(UserDao.class);
-        this.accountDao = ComponentContext.getComponent(AccountDao.class);
-        this.domainDao = ComponentContext.getComponent(DomainDao.class);
+        this.userDao = getUserDao();
+        this.accountDao = getAccountDao();
+        this.domainDao = getDomainDao();
 
+        populateLocalList(parentDomain);
+        populateRemoteList();
+
+        localUserManager = allocateLocalUserManager();
+        eventProcessor = allocateRemoteUserEventProcessor();
+    }
+
+    private void populateLocalList(DomainVO parentDomain)
+    {
         localParentDomain = parentDomain;
         localAccountList = accountDao.findActiveAccountsForDomain(localParentDomain.getId());
         localList = new ArrayList<UserVO>();
@@ -55,9 +64,12 @@ public class UserFullSyncProcessor extends FullSyncProcessor {
             if (localParentDomain.getName().equals("ROOT") && account.getAccountName().equals("system"))   continue;
             localList.addAll(userDao.listByAccount(account.getId()));
         }
+    }
 
+    private void populateRemoteList() throws Exception
+    {
         String remoteParentDomainId = null;
-        DomainService domainService = new DomainService(hostName, endPoint, userName, password);
+        DomainService domainService = allocateDomainService();
         RmapVO rmap = rmapDao.findBySource(localParentDomain.getUuid(), region.getId());
         if (rmap == null)
         {
@@ -72,7 +84,7 @@ public class UserFullSyncProcessor extends FullSyncProcessor {
         {
             remoteParentDomainId = rmap.getUuid();
         }
-        AccountService accountService = new AccountService(hostName, endPoint, userName, password);
+        AccountService accountService = allocateAccountService();
         JSONArray remoteAccounts = accountService.list(remoteParentDomainId);
         remoteAccountList = new ArrayList<JSONObject>();
         for(int idx = 0; idx < remoteAccounts.length(); idx++)
@@ -86,7 +98,7 @@ public class UserFullSyncProcessor extends FullSyncProcessor {
 
             }
         }
-        UserService userService = new UserService(hostName, endPoint, userName, password);
+        UserService userService = allocateUserService();
         JSONArray remoteArray = userService.list(remoteParentDomainId, null);
         remoteList = new ArrayList<JSONObject>();
         for(int idx = 0; idx < remoteArray.length(); idx++)
@@ -100,9 +112,6 @@ public class UserFullSyncProcessor extends FullSyncProcessor {
 
             }
         }
-
-        localUserManager = new LocalUserManager();
-        eventProcessor = new RemoteUserEventProcessor(hostName, endPoint, userName, password);
     }
 
     private AccountVO getAccount(UserVO user)
@@ -151,6 +160,16 @@ public class UserFullSyncProcessor extends FullSyncProcessor {
         {
             s_logger.error("Failed to synchronize users : " + ex.getStackTrace());
         }
+    }
+
+    protected LocalUserManager allocateLocalUserManager()
+    {
+        return new LocalUserManager();
+    }
+
+    protected RemoteUserEventProcessor allocateRemoteUserEventProcessor()
+    {
+        return new RemoteUserEventProcessor(hostName, endPoint, userName, password);
     }
 
     protected void expungeProcessedLocals()
@@ -302,7 +321,7 @@ public class UserFullSyncProcessor extends FullSyncProcessor {
 
     protected boolean synchronizeUsingRemoved(JSONObject remoteJson) throws Exception
     {
-        String remotePath = BaseService.getAttrValue(remoteJson, "path");
+        //String remotePath = BaseService.getAttrValue(remoteJson, "path");
         Date created = getDate(remoteJson, "created");
         if (created == null)
         {

@@ -142,6 +142,8 @@ public class UserVO implements User, Identity, InternalIdentity {
         return removed;
     }
 
+    public void setRemoved(Date removed) { this.removed = removed; }
+
     @Override
     public String getUsername() {
         return username;
