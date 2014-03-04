@@ -25,9 +25,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import com.amazonaws.util.json.JSONArray;
-import com.amazonaws.util.json.JSONException;
-import com.amazonaws.util.json.JSONObject;
 import com.cloud.domain.DomainVO;
 import com.cloud.domain.dao.DomainDao;
 import com.cloud.region.service.UserService;
@@ -111,41 +108,6 @@ public class UserLocalGeneratorEventTest extends TestCase {
 
         };
     }
-	
-	
-    /*@Test
-    public void testcreate() {
-    	
-    	RegionVO localRegion = new RegionVO();
-        localRegion.setActive(true);
-        localRegion.setName("Local");
-        localRegion.setPassword("fsdfdsdf");
-        localRegion.setEndPoint("endPoint");
-        localRegion.setUserName("userName");
-    	
-    	UserService userService = userLocalGeneratorEvent.getUserService(localRegion);
-    	
-    	JSONObject jsonObj = new JSONObject();
-
-		JSONArray list = new JSONArray();
-
-		JSONObject jsonObj1 = new JSONObject();
-		try {
-			jsonObj1.put("domainid", "1");
-			jsonObj.put("account", list);
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		list.put(jsonObj1);
-
-    	Mockito.when(userService.create("userName", "accountName", "domainPath", "password", "customer@abc.com", "firstName", "lastName", "IST")).thenReturn(jsonObj);
-    	
-    	userLocalGeneratorEvent.create();
-    	
-    	
-    }*/
    
     @Test
     public void testUpdate() {
@@ -156,7 +118,11 @@ public class UserLocalGeneratorEventTest extends TestCase {
     	userVO.setUuid("242134");
     	
     	UserVO result = userLocalGeneratorEvent.update(userVO);
-    	Assert.assertEquals(userVO, result);
+    	Assert.assertNotNull(result);
+    	
+		// if the input user is null
+    	UserVO result1 = userLocalGeneratorEvent.update(null);
+		Assert.assertNotNull(result1);
     	
     }
     
@@ -169,8 +135,12 @@ public class UserLocalGeneratorEventTest extends TestCase {
     	userVO.setState(State.enabled);
     	
     	UserVO result = userLocalGeneratorEvent.lock(userVO);
-    	Assert.assertEquals(userVO, result);
+    	Assert.assertNotNull(result);
     	
+		// if the input user is null
+    	UserVO result1 = userLocalGeneratorEvent.lock(null);
+		Assert.assertNotNull(result1);
+
     }
  
     
@@ -182,7 +152,12 @@ public class UserLocalGeneratorEventTest extends TestCase {
     	userVO.setState(State.enabled);
     	
     	UserVO result = userLocalGeneratorEvent.disable(userVO);
-    	Assert.assertEquals(userVO, result);
+    	Assert.assertNotNull(result);
+    	
+		// if the input user is null
+    	UserVO result1 = userLocalGeneratorEvent.disable(null);
+		Assert.assertNotNull(result1);
+
     	
     }   
     
@@ -194,7 +169,12 @@ public class UserLocalGeneratorEventTest extends TestCase {
     	userVO.setState(State.enabled);
     	
     	UserVO result = userLocalGeneratorEvent.enable(userVO);
-    	Assert.assertEquals(userVO, result);
+    	Assert.assertNotNull(result);
+    	
+		// if the input user is null
+    	UserVO result1 = userLocalGeneratorEvent.enable(null);
+		Assert.assertNotNull(result1);
+
     	
     }   
     
@@ -206,8 +186,12 @@ public class UserLocalGeneratorEventTest extends TestCase {
     	userVO.setState(State.enabled);
     	
     	UserVO result = userLocalGeneratorEvent.remove(userVO);
-    	Assert.assertEquals(userVO, result);
+    	Assert.assertNotNull(result);
     	
+		// if the input user is null
+    	UserVO result1 = userLocalGeneratorEvent.remove(null);
+		Assert.assertNotNull(result1);
+
     } 
 
 }

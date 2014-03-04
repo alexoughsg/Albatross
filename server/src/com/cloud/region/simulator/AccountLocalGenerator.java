@@ -15,10 +15,14 @@ public class AccountLocalGenerator extends LocalGenerator {
     private static final Logger s_logger = Logger.getLogger(AccountLocalGenerator.class);
 
     private LocalAccountManager localAccountManager;
+    
+    public LocalAccountManager getLocalAccountManager() {
+		return new LocalAccountManager();
+	}
 
-    public AccountLocalGenerator()
+	public AccountLocalGenerator()
     {
-        this.localAccountManager = new LocalAccountManager();
+        this.localAccountManager = getLocalAccountManager();
     }
 
     public AccountVO create()

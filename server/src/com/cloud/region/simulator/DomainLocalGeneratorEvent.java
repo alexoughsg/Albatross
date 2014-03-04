@@ -14,12 +14,23 @@ public class DomainLocalGeneratorEvent extends LocalGenerator {
     private static final Logger s_logger = Logger.getLogger(DomainLocalGeneratorEvent.class);
 
     private DomainService domainService;
+    private RegionDao regionDao;
+    
 
-    public DomainLocalGeneratorEvent()
+	public RegionDao getRegionDao() {
+		return ComponentContext.getComponent(RegionDao.class);
+	}
+	
+	public DomainService getDomainService(RegionVO region) {
+		return new DomainService(region.getName(), region.getEndPoint(), region.getUserName(), region.getPassword());
+	}
+	
+
+	public DomainLocalGeneratorEvent()
     {
-        RegionDao regionDao = ComponentContext.getComponent(RegionDao.class);
+        this.regionDao = getRegionDao();
         RegionVO region = regionDao.findByName("Local");
-        this.domainService = new DomainService(region.getName(), region.getEndPoint(), region.getUserName(), region.getPassword());
+        this.domainService = getDomainService(region);
     }
 
     public JSONObject create()

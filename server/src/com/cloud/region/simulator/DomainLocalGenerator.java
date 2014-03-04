@@ -12,10 +12,14 @@ public class DomainLocalGenerator extends LocalGenerator {
     private static final Logger s_logger = Logger.getLogger(DomainLocalGenerator.class);
 
     private LocalDomainManager localDomainManager;
+    
+    public LocalDomainManager getLocalDomainManager() {
+		return new LocalDomainManager();
+	}
 
-    public DomainLocalGenerator()
+	public DomainLocalGenerator()
     {
-        this.localDomainManager = new LocalDomainManager();
+        this.localDomainManager = getLocalDomainManager();
     }
 
     public DomainVO create()

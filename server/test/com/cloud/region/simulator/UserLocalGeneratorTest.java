@@ -16,27 +16,21 @@
 // under the License.
 package com.cloud.region.simulator;
 
-import org.apache.cloudstack.region.RegionVO;
-import org.apache.cloudstack.region.dao.RegionDao;
+import junit.framework.Assert;
+import junit.framework.TestCase;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import com.amazonaws.util.json.JSONArray;
-import com.amazonaws.util.json.JSONException;
-import com.amazonaws.util.json.JSONObject;
 import com.cloud.domain.DomainVO;
 import com.cloud.domain.dao.DomainDao;
 import com.cloud.region.service.LocalUserManager;
-import com.cloud.region.service.UserService;
+import com.cloud.user.Account.State;
 import com.cloud.user.AccountVO;
 import com.cloud.user.UserVO;
-import com.cloud.user.Account.State;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.user.dao.UserDao;
-
-import junit.framework.Assert;
-import junit.framework.TestCase;
 
 public class UserLocalGeneratorTest extends TestCase {
 
@@ -110,7 +104,11 @@ public class UserLocalGeneratorTest extends TestCase {
     	userVO.setUuid("242134");
     	
     	UserVO result = userLocalGenerator.update(userVO);
-    	Assert.assertEquals(userVO, result);
+    	Assert.assertNotNull(result);
+
+    	// If the input user is null
+    	UserVO result1 = userLocalGenerator.update(null);
+    	Assert.assertNotNull(result1);
     	
     }
     
@@ -123,7 +121,12 @@ public class UserLocalGeneratorTest extends TestCase {
     	userVO.setState(State.enabled);
     	
     	UserVO result = userLocalGenerator.lock(userVO);
-    	Assert.assertEquals(userVO, result);
+    	Assert.assertNotNull(result);
+    	
+       	// If the input user is null
+    	UserVO result1 = userLocalGenerator.lock(null);
+    	Assert.assertNotNull(result1);
+
     	
     }
  
@@ -136,7 +139,12 @@ public class UserLocalGeneratorTest extends TestCase {
     	userVO.setState(State.enabled);
     	
     	UserVO result = userLocalGenerator.disable(userVO);
-    	Assert.assertEquals(userVO, result);
+    	Assert.assertNotNull(result);
+    	
+       	// If the input user is null
+    	UserVO result1 = userLocalGenerator.disable(null);
+    	Assert.assertNotNull(result1);
+
     	
     }   
     
@@ -148,7 +156,12 @@ public class UserLocalGeneratorTest extends TestCase {
     	userVO.setState(State.enabled);
     	
     	UserVO result = userLocalGenerator.enable(userVO);
-    	Assert.assertEquals(userVO, result);
+    	Assert.assertNotNull(result);
+    	
+       	// If the input user is null
+    	UserVO result1 = userLocalGenerator.enable(null);
+    	Assert.assertNotNull(result1);
+
     	
     }   
     
@@ -160,7 +173,12 @@ public class UserLocalGeneratorTest extends TestCase {
     	userVO.setState(State.enabled);
     	
     	UserVO result = userLocalGenerator.remove(userVO);
-    	Assert.assertEquals(userVO, result);
+    	Assert.assertNotNull(result);
+    	
+       	// If the input user is null
+    	UserVO result1 = userLocalGenerator.remove(null);
+    	Assert.assertNotNull(result1);
+
     	
     } 
 	

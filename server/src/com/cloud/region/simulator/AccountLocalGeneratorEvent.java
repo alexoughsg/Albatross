@@ -18,12 +18,21 @@ public class AccountLocalGeneratorEvent extends LocalGenerator {
 
     private AccountService accountService;
     private DomainDao domainDao;
+    private RegionDao regionDao;
+    
 
-    public AccountLocalGeneratorEvent()
+	public DomainDao getDomainDao() {
+		return ComponentContext.getComponent(DomainDao.class);
+	}
+	
+	public RegionDao getRegionDao() {
+		return ComponentContext.getComponent(RegionDao.class);
+	}
+
+	public AccountLocalGeneratorEvent()
     {
-        this.domainDao = ComponentContext.getComponent(DomainDao.class);
-
-        RegionDao regionDao = ComponentContext.getComponent(RegionDao.class);
+        this.domainDao = getDomainDao();
+        this.regionDao = getRegionDao();
         RegionVO region = regionDao.findByName("Local");
         this.accountService = new AccountService(region.getName(), region.getEndPoint(), region.getUserName(), region.getPassword());
     }
