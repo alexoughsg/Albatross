@@ -155,7 +155,6 @@ public class AccountFullSyncProcessorTest extends TestCase {
                     {
                         // this account exists in both local & remote
                         JSONObject account1 = new JSONObject();
-                        //account1.put("domainId", "uuid1");
                         account1.put("id", "uuid1");
                         account1.put("name", "account1");
                         account1.put("state", "enabled");
@@ -164,7 +163,6 @@ public class AccountFullSyncProcessorTest extends TestCase {
 
                         // this account exists in both local & remote
                         JSONObject account2 = new JSONObject();
-                        //account2.put("domainId", "uuid1");
                         account2.put("id", "uuid2");
                         account2.put("name", "account2");
                         account2.put("state", "disabled");
@@ -173,7 +171,6 @@ public class AccountFullSyncProcessorTest extends TestCase {
 
                         // this account exists in both local & remote with no rmap
                         JSONObject account3 = new JSONObject();
-                        //account3.put("domainId", "uuid1");
                         account3.put("id", "uuid3");
                         account3.put("name", "account3");
                         account3.put("state", "locked");
