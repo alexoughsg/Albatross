@@ -21,8 +21,8 @@ public class RemoteUserEventProcessor extends RemoteEventProcessor {
 
     public JSONObject findLatestRemoteRemoveEvent(Object object) throws Exception
     {
-        DomainDao domainDao = ComponentContext.getComponent(DomainDao.class);
-        AccountDao accountDao = ComponentContext.getComponent(AccountDao.class);
+        DomainDao domainDao = getDomainDao();
+        AccountDao accountDao = getAccountDao();
         UserVO user = (UserVO)object;
         AccountVO account = accountDao.findById(user.getAccountId());
         DomainVO domain = domainDao.findById(account.getDomainId());

@@ -2,6 +2,10 @@ package com.cloud.region.service;
 
 import com.amazonaws.util.json.JSONArray;
 import com.amazonaws.util.json.JSONObject;
+import com.cloud.domain.dao.DomainDao;
+import com.cloud.user.dao.AccountDao;
+import com.cloud.user.dao.UserDao;
+import com.cloud.utils.component.ComponentContext;
 
 import java.util.Date;
 
@@ -17,9 +21,29 @@ public abstract class RemoteEventProcessor {
 
     }
 
+    protected BaseService allocateBaseService()
+    {
+        return new BaseService(hostName, endPoint, userName, password);
+    }
+
+    protected DomainDao getDomainDao()
+    {
+        return ComponentContext.getComponent(DomainDao.class);
+    }
+
+    protected AccountDao getAccountDao()
+    {
+        return ComponentContext.getComponent(AccountDao.class);
+    }
+
+    protected UserDao getUserDao()
+    {
+        return ComponentContext.getComponent(UserDao.class);
+    }
+
     protected JSONArray listEvents(Date created, String eventType) throws Exception
     {
-        BaseService baseService = new BaseService(hostName, endPoint, userName, password);
+        BaseService baseService = allocateBaseService();
         return baseService.listEvents(eventType, "completed", created, null);
     }
 
