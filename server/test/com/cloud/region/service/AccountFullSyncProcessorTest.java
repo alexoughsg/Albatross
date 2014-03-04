@@ -10,7 +10,6 @@ import com.cloud.user.Account;
 import com.cloud.user.AccountVO;
 import com.cloud.user.UserVO;
 import com.cloud.user.dao.AccountDao;
-import com.cloud.user.dao.UserDao;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 import org.apache.cloudstack.region.RegionVO;

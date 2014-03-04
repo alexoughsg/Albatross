@@ -31,8 +31,17 @@ public class DomainFullSyncProcessor extends FullSyncProcessor {
     {
         super(region);
 
-        this.domainDao = ComponentContext.getComponent(DomainDao.class);
+        this.domainDao = getDomainDao();
 
+        populateLocalList(parentDomain);
+        populateRemoteList();
+
+        localDomainManager = allocateLocalDomainManager();
+        eventProcessor = allocateRemoteDomainEventProcessor();
+    }
+
+    private void populateLocalList(DomainVO parentDomain)
+    {
         localParent = parentDomain;
         localList = domainDao.findImmediateChildrenForParent(localParent.getId());
         for(int idx = localList.size()-1; idx >= 0; idx--)
@@ -41,9 +50,12 @@ public class DomainFullSyncProcessor extends FullSyncProcessor {
             if (!domain.getState().equals(Domain.State.Inactive))   continue;
             localList.remove(domain);
         }
+    }
 
+    private void populateRemoteList() throws Exception
+    {
         String remoteParentDomainId = null;
-        DomainService domainService = new DomainService(hostName, endPoint, userName, password);
+        DomainService domainService = allocateDomainService();
         RmapVO rmap = rmapDao.findBySource(localParent.getUuid(), region.getId());
         if (rmap == null)
         {
@@ -78,9 +90,6 @@ public class DomainFullSyncProcessor extends FullSyncProcessor {
 
             }
         }
-
-        localDomainManager = new LocalDomainManager();
-        eventProcessor = new RemoteDomainEventProcessor(hostName, endPoint, userName, password);
     }
 
     private void syncAttributes(DomainVO domain, JSONObject remoteJson) throws Exception
@@ -108,6 +117,16 @@ public class DomainFullSyncProcessor extends FullSyncProcessor {
         {
             s_logger.error("Failed to synchronize domains : " + ex.getStackTrace());
         }
+    }
+
+    protected LocalDomainManager allocateLocalDomainManager()
+    {
+        return new LocalDomainManager();
+    }
+
+    protected RemoteDomainEventProcessor allocateRemoteDomainEventProcessor()
+    {
+        return new RemoteDomainEventProcessor(hostName, endPoint, userName, password);
     }
 
     protected void expungeProcessedLocals()
