@@ -222,7 +222,7 @@ public class AccountFullSyncProcessorTest extends TestCase {
     }
 
     @Test
-    public void testSynchronizeByLocal()
+    public void testSynchronize()
     {
         Assert.assertTrue(accountFullSyncProcessor.localList.size() == 4);
         Assert.assertTrue(accountFullSyncProcessor.remoteList.size() == 4);

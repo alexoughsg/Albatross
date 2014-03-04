@@ -219,7 +219,7 @@ public class DomainFullSyncProcessorTest extends TestCase {
     }
 
     @Test
-    public void testSynchronizeByLocal()
+    public void testSynchronize()
     {
         Assert.assertTrue(domainFullSyncProcessor.localList.size() == 4);
         Assert.assertTrue(domainFullSyncProcessor.remoteList.size() == 4);

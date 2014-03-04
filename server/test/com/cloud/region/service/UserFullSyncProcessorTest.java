@@ -251,7 +251,7 @@ public class UserFullSyncProcessorTest extends TestCase {
     }
 
     @Test
-    public void testSynchronizeByLocal()
+    public void testSynchronize()
     {
         Assert.assertTrue(userFullSyncProcessor.localList.size() == 4);
         Assert.assertTrue(userFullSyncProcessor.remoteList.size() == 4);
