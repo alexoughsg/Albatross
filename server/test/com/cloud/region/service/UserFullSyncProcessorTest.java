@@ -256,7 +256,12 @@ public class UserFullSyncProcessorTest extends TestCase {
         Assert.assertTrue(userFullSyncProcessor.localList.size() == 4);
         Assert.assertTrue(userFullSyncProcessor.remoteList.size() == 4);
 
-        userFullSyncProcessor.synchronize();
+        userFullSyncProcessor.synchronizeByLocal();
+
+        Assert.assertTrue(userFullSyncProcessor.localList.size() == 0);
+        Assert.assertTrue(userFullSyncProcessor.remoteList.size() == 1);
+
+        userFullSyncProcessor.synchronizeByRemote();
 
         Assert.assertTrue(userFullSyncProcessor.localList.size() == 0);
         Assert.assertTrue(userFullSyncProcessor.remoteList.size() == 0);

@@ -34,9 +34,18 @@ public class AccountFullSyncProcessor extends FullSyncProcessor {
     {
         super(region);
 
-        this.accountDao = ComponentContext.getComponent(AccountDao.class);
-        this.domainDao = ComponentContext.getComponent(DomainDao.class);
+        this.accountDao = getAccountDao();
+        this.domainDao = getDomainDao();
 
+        populateLocalList(parentDomain);
+        populateRemoteList();
+
+        localAccountManager = allocateLocalAccountManager();
+        eventProcessor = allocateRemoteAccountEventProcessor();
+    }
+
+    private void populateLocalList(DomainVO parentDomain)
+    {
         localParent = parentDomain;
         localList = accountDao.findActiveAccountsForDomain(localParent.getId());
         if (localParent.getName().equals("ROOT"))
@@ -48,9 +57,12 @@ public class AccountFullSyncProcessor extends FullSyncProcessor {
                 localList.remove(account);
             }
         }
+    }
 
+    private void populateRemoteList() throws Exception
+    {
         String remoteParentDomainId = null;
-        DomainService domainService = new DomainService(hostName, endPoint, userName, password);
+        DomainService domainService = allocateDomainService();
         RmapVO rmap = rmapDao.findBySource(localParent.getUuid(), region.getId());
         if (rmap == null)
         {
@@ -72,7 +84,7 @@ public class AccountFullSyncProcessor extends FullSyncProcessor {
                 throw new Exception("The parent domain[" + remoteParentDomainId + "] cannot be found in the remote region[" + hostName + "].");
             }
         }
-        AccountService accountService = new AccountService(hostName, endPoint, userName, password);
+        AccountService accountService = allocateAccountService();
         JSONArray remoteArray = accountService.list(remoteParentDomainId);
         remoteList = new ArrayList<JSONObject>();
         for(int idx = 0; idx < remoteArray.length(); idx++)
@@ -86,9 +98,6 @@ public class AccountFullSyncProcessor extends FullSyncProcessor {
 
             }
         }
-
-        localAccountManager = new LocalAccountManager();
-        eventProcessor = new RemoteAccountEventProcessor(hostName, endPoint, userName, password);
     }
 
     private void syncAttributes(AccountVO account, JSONObject remoteJson) throws Exception
@@ -116,6 +125,16 @@ public class AccountFullSyncProcessor extends FullSyncProcessor {
         {
             s_logger.error("Failed to synchronize accounts : " + ex.getStackTrace());
         }
+    }
+
+    protected LocalAccountManager allocateLocalAccountManager()
+    {
+        return new LocalAccountManager();
+    }
+
+    protected RemoteAccountEventProcessor allocateRemoteAccountEventProcessor()
+    {
+        return new RemoteAccountEventProcessor(hostName, endPoint, userName, password);
     }
 
     protected void expungeProcessedLocals()
@@ -265,7 +284,7 @@ public class AccountFullSyncProcessor extends FullSyncProcessor {
 
     protected boolean synchronizeUsingRemoved(JSONObject remoteJson) throws Exception
     {
-        String remotePath = BaseService.getAttrValue(remoteJson, "path");
+        //String remotePath = BaseService.getAttrValue(remoteJson, "path");
         Date created = getDate(remoteJson, "created");
         if (created == null)
         {
